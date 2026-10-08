@@ -1,0 +1,45 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="brand-title" (click)="irParaHome()" style="cursor: pointer;" title="Voltar para a Home">🏠 Imobly</h1>
+    <p class="brand-subtitle">Conectando imóveis e pessoas</p>
+ 
+
+    <form (ngSubmit)="entrar()">
+      <div class="form-group">
+        <label for="perfil">Perfil de Acesso</label>
+        <select id="perfil" [(ngModel)]="perfilSelecionado" name="perfil" class="form-control">
+          <option value="Locatario">Locatário (Procuro imóvel)</option>
+          <option value="Proprietario">Proprietário / Imobiliária</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input 
+          type="email" 
+          id="email" 
+          [(ngModel)]="email" 
+          name="email" 
+          placeholder="seuemail@exemplo.com" 
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Palavra-passe</label>
+        <input 
+          type="password" 
+          id="senha" 
+          [(ngModel)]="senha" 
+          name="senha" 
+          placeholder="••••••••" 
+          class="form-control"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary">Entrar no Imobly</button>
+    </form>
+  </div>
+</div>

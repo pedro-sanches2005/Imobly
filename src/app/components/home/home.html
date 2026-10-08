@@ -1,0 +1,314 @@
+<div class="home-container" #homeContainer>
+  <!-- Navbar Flutuante -->
+  <nav class="navbar">
+    <div class="brand" (click)="irParaHome()" style="cursor: pointer;" title="Voltar ao início">
+      <span class="logo-icon">🏠</span>
+      <span class="brand-name">Imobly <small class="region-badge">Itu & Região</small></span>
+    </div>
+
+    <div class="nav-links">
+      <a href="#condominios" (click)="rolarParaSeccao('condominios', $event)">Condomínios</a>
+      <a href="#destaques" (click)="rolarParaSeccao('destaques', $event)">Lançamentos</a>
+      <a href="#contato" (click)="rolarParaSeccao('contato', $event)">Contato</a>
+    </div>
+
+    <div class="nav-actions">
+      <div class="theme-toggle">
+        <button [class.active]="themeService.currentTheme === 'light'" (click)="mudarTema('light')" title="Modo Claro">☀️</button>
+        <button [class.active]="themeService.currentTheme === 'dark'" (click)="mudarTema('dark')" title="Modo Escuro">🌙</button>
+        <button [class.active]="themeService.currentTheme === 'system'" (click)="mudarTema('system')" title="Tema do Sistema">💻</button>
+      </div>
+
+      <button class="btn-secondary" (click)="irParaLogin()">Entrar</button>
+      <button class="btn-primary" (click)="irParaDescoberta()">Explorar Imóveis</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section com Busca -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-subtitle">VIVA ONDE VOCÊ PODE SER POR INTEIRO</span>
+      <h1 class="hero-title">Encontre seu imóvel dos sonhos em Itu, Salto e Indaiatuba</h1>
+      <p class="hero-description">
+        Curadoria exclusiva de casas em condomínio fechado, terrenos e apartamentos de alto padrão com assessoria dedicada.
+      </p>
+
+      <!-- Caixa de Busca Interativa -->
+      <div class="search-box-wrapper">
+        <div class="search-tabs">
+          <button class="tab-btn" [class.active]="abaSelecionada === 'comprar'" (click)="selecionarAba('comprar')">Comprar</button>
+          <button class="tab-btn" [class.active]="abaSelecionada === 'alugar'" (click)="selecionarAba('alugar')">Alugar</button>
+          <button class="tab-btn" [class.active]="abaSelecionada === 'condominios'" (click)="selecionarAba('condominios')">Condomínios</button>
+          <button class="tab-btn" [class.active]="abaSelecionada === 'lancamentos'" (click)="selecionarAba('lancamentos')">Lançamentos</button>
+        </div>
+
+        <div class="search-fields">
+          <div class="field-group">
+            <label>Localização</label>
+            <select [(ngModel)]="cidadeSelecionada">
+              <option value="">Todas as cidades</option>
+              <option value="itu">Itu - SP</option>
+              <option value="indaiatuba">Indaiatuba - SP</option>
+              <option value="salto">Salto - SP</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Tipo de Imóvel</label>
+            <select [(ngModel)]="tipoImovelSelecionado" (change)="onTipoImovelChange()">
+              <option value="">Todos os tipos</option>
+              <option value="casa-condominio">Casa em Condomínio</option>
+              <option value="terreno">Terreno / Lote</option>
+              <option value="apartamento">Apartamento Luxo</option>
+            </select>
+          </div>
+
+          <div class="field-group" [class.field-disabled]="tipoImovelSelecionado === 'terreno'">
+            <label>Quartos / Suítes</label>
+            <select [(ngModel)]="quartosSelecionados" [disabled]="tipoImovelSelecionado === 'terreno'">
+              <option value="">{{ tipoImovelSelecionado === 'terreno' ? 'Não aplicável' : 'Qualquer' }}</option>
+              <option value="2">2+ Quartos</option>
+              <option value="3">3+ Suítes</option>
+              <option value="4">4+ Suítes</option>
+            </select>
+          </div>
+
+          <button class="btn-search" (click)="irParaDescoberta()">
+            🔍 Buscar Imóveis
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARROSSEL EXCLUSIVO DE DESTAQUES E REGIÕES (Com Filtro Dinâmico) -->
+  <section class="zonas-carousel-section" (mouseenter)="pararCarrosselAutomatico()" (mouseleave)="iniciarCarrosselAutomatico()">
+    <div class="carousel-container">
+      
+      <!-- Slide Ativo -->
+      <div 
+        *ngFor="let zona of zonasAtendidas; let i = index" 
+        class="carousel-slide" 
+        [class.active]="i === slideAtualIndex">
+        
+        <img [src]="zona.imagem" [alt]="zona.titulo" />
+        <div class="slide-overlay"></div>
+
+        <!-- Card Flutuante com Envio do Filtro do Condomínio -->
+        <div class="slide-content-card">
+          <div class="location-badge">
+            <span class="pin-icon">📍</span> {{ zona.cidade }}
+          </div>
+          <span class="slide-subtitle">{{ zona.subtitulo }}</span>
+          <h2 class="slide-title">{{ zona.titulo }}</h2>
+          
+          <button class="btn-confira-imobly" (click)="irParaDescoberta(zona.linkFiltro)">
+            <span>Ver Imóveis Disponíveis</span>
+            <span class="arrow-btn">➔</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles Laterais (Setas) -->
+      <button class="nav-arrow arrow-left" (click)="slideAnterior()" title="Anterior">‹</button>
+      <button class="nav-arrow arrow-right" (click)="proximoSlide()" title="Próximo">›</button>
+
+      <!-- Indicadores / Dots na Parte Inferior -->
+      <div class="carousel-dots">
+        <span 
+          *ngFor="let dot of zonasAtendidas; let idx = index" 
+          class="dot" 
+          [class.active]="idx === slideAtualIndex" 
+          (click)="irParaSlide(idx)">
+        </span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Seção Regiões de Atuação -->
+  <section id="condominios" class="section-condominios">
+    <div class="section-header">
+      <h2>Regiões que Atuamos</h2>
+      <p>Presença forte e inteligência imobiliária nas principais cidades do interior paulista</p>
+    </div>
+
+    <div class="condominios-grid">
+      <div class="condominio-card" (click)="irParaDescoberta('itu')">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800" alt="Itu - SP" />
+        <div class="condominio-overlay">
+          <h3>Itu • SP</h3>
+          <span>Cidade Histórica & Condomínios de Alto Padrão</span>
+          <p>Terras de São José, Fazenda Vila Real, Plaza Athénée e centro nobre.</p>
+        </div>
+      </div>
+
+      <div class="condominio-card" (click)="irParaDescoberta('indaiatuba')">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800" alt="Indaiatuba - SP" />
+        <div class="condominio-overlay">
+          <h3>Indaiatuba • SP</h3>
+          <span>Qualidade de Vida & Infraestrutura Urbana</span>
+          <p>Helvetia, Dona Maria José, Mosteiro de Itaici e Parque Ecológico.</p>
+        </div>
+      </div>
+
+      <div class="condominio-card" (click)="irParaDescoberta('salto')">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800" alt="Salto - SP" />
+        <div class="condominio-overlay">
+          <h3>Salto • SP</h3>
+          <span>Tranquilidade & Excelente Custo-Benefício</span>
+          <p>Zonas residenciais nobres, Zuleika Jabour e empreendimentos modernos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galeria Destaques -->
+  <section id="destaques" class="section-imoveis">
+    <div class="section-header">
+      <h2>Oportunidades Selecionadas</h2>
+      <p>Residências prontas para morar e viver com qualidade incomparável</p>
+    </div>
+
+    <div class="imoveis-grid">
+      <div class="property-card" (click)="irParaDescoberta()">
+        <div class="property-tag">Venda • Exclusividade</div>
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600" alt="Casa Terras de São José" />
+        <div class="property-details">
+          <span class="location">📍 Terras de São José, Itu/SP</span>
+          <h3>Mansão Térrea com Arquitetura Contemporânea</h3>
+          <div class="specs">
+            <span>🛏️ 5 Suítes</span>
+            <span>🚗 6 Vagas</span>
+            <span>📐 850m²</span>
+          </div>
+          <div class="price-bar">
+            <span class="price">R$ 7.800.000</span>
+            <button class="btn-visita">Agendar Visita</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="property-card" (click)="irParaDescoberta()">
+        <div class="property-tag">Venda • Lançamento</div>
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600" alt="Casa Vila Real" />
+        <div class="property-details">
+          <span class="location">📍 Fazenda Vila Real, Itu/SP</span>
+          <h3>Residência Integrada à Natureza com Vista Panorâmica</h3>
+          <div class="specs">
+            <span>🛏️ 4 Suítes</span>
+            <span>🚗 4 Vagas</span>
+            <span>📐 620m²</span>
+          </div>
+          <div class="price-bar">
+            <span class="price">R$ 5.450.000</span>
+            <button class="btn-visita">Agendar Visita</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="property-card" (click)="irParaDescoberta()">
+        <div class="property-tag">Locação Premium</div>
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600" alt="Casa Indaiatuba" />
+        <div class="property-details">
+          <span class="location">📍 Jardins do Império, Indaiatuba/SP</span>
+          <h3>Casa de Condomínio Mobiliada e Decorada</h3>
+          <div class="specs">
+            <span>🛏️ 3 Suítes</span>
+            <span>🚗 2 Vagas</span>
+            <span>📐 280m²</span>
+          </div>
+          <div class="price-bar">
+            <span class="price">R$ 12.500/mês</span>
+            <button class="btn-visita">Agendar Visita</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner Concierge -->
+  <section class="section-concierge" id="contato">
+    <div class="concierge-content">
+      <h2>Procurando algo altamente específico?</h2>
+      <p>Nossos consultores e assistente virtual encontram o imóvel sob medida para você.</p>
+      <div class="concierge-actions">
+        <button class="btn-chat-action" (click)="toggleChat()">
+          💬 Falar com Consultora Virtual
+        </button>
+        <button class="btn-outline" (click)="irParaLogin()">Cadastrar Interesse</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3>Imobly</h3>
+        <p>Especialistas em negócios imobiliários de alto padrão no Interior de SP. Atendendo Itu, Salto, Indaiatuba e região.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="#condominios" (click)="rolarParaSeccao('condominios', $event)">Condomínios de Luxo</a></li>
+          <li><a href="#destaques" (click)="rolarParaSeccao('destaques', $event)">Imóveis em Destaque</a></li>
+          <li><a (click)="irParaDescoberta()" style="cursor: pointer;">Feed de Match</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Cidades Atendidas</h4>
+        <ul>
+          <li>Itu - SP</li>
+          <li>Indaiatuba - SP</li>
+          <li>Salto - SP</li>
+          <li>Porto Feliz - SP</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Imobly . Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- WIDGET FLUTUANTE DE CHATBOT -->
+  <div class="chatbot-widget" [class.aberto]="chatAberto">
+    <button class="chatbot-trigger" *ngIf="!chatAberto" (click)="toggleChat()" title="Falar com Consultora">
+      <span class="chat-icon">💬</span>
+      <span class="trigger-text">Atendimento Imobly</span>
+      <span class="online-indicator"></span>
+    </button>
+
+    <div class="chatbot-window" *ngIf="chatAberto">
+      <div class="chat-header">
+        <div class="bot-info">
+          <div class="bot-avatar">🤖</div>
+          <div>
+            <h4>Bia • Consultora Imobly</h4>
+            <span class="status">Online agora</span>
+          </div>
+        </div>
+        <button class="btn-close-chat" (click)="toggleChat()">✖</button>
+      </div>
+
+      <div class="chat-body">
+        <div *ngFor="let msg of mensagens" class="chat-msg" [class.msg-user]="msg.remetente === 'user'" [class.msg-bot]="msg.remetente === 'bot'">
+          <div class="msg-bubble">
+            {{ msg.texto }}
+          </div>
+          <span class="msg-time">{{ msg.horario }}</span>
+        </div>
+      </div>
+
+      <div class="chat-footer">
+        <input 
+          type="text" 
+          placeholder="Digite sua dúvida ou imóvel desejado..." 
+          [(ngModel)]="mensagemDigitada" 
+          (keyup.enter)="enviarMensagem()" />
+        <button (click)="enviarMensagem()" title="Enviar">Enviar ➔</button>
+      </div>
+    </div>
+  </div>
+</div>
