@@ -7,7 +7,7 @@
   scroll-behavior: smooth;
 }
 
-/* Navbar Flutuante */
+/* Navbar Fixa no Topo */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -16,25 +16,87 @@
   background-color: var(--bg-navbar);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
   box-shadow: 0 4px 20px var(--shadow-color);
 }
+
 html, body {
   scroll-behavior: smooth;
   margin: 0;
   padding: 0;
 }
 
+/* Espaçamento para o conteúdo não ficar sob a navbar fixa */
+body {
+  padding-top: 85px;
+}
+
+/* Ajusta o espaçamento do grupo de ações à direita para aproximar o botão "Explorar Imóveis" para a esquerda */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Aumenta ligeiramente o espaço interno ou desloca o conjunto */
+  margin-right: 3rem; /* Adiciona uma margem à direita para recuar o botão para a esquerda */
+}
+
+/* Definição de Variáveis para Tema Claro (Light Mode) refinado */
+:root, [data-theme="light"] {
+  --bg-primary: #f8fafc;        /* Fundo off-white suave e elegante */
+  --bg-card: #ffffff;          /* Cartões em branco puro para forte destaque */
+  --bg-navbar: rgba(255, 255, 255, 0.85); /* Navbar translúcida clara */
+  --text-primary: #0f172a;     /* Azul-ardósia escuro para máxima legibilidade */
+  --text-secondary: #475569;   /* Cinzento médio-escuro nítido (adeus letras sumidas) */
+  --border-color: #cbd5e1;     /* Bordas visíveis e limpas */
+  --shadow-color: rgba(15, 23, 42, 0.08); /* Sombra suave para profundidade */
+  --chip-bg: #f1f5f9;          /* Fundo para chips e rótulos pequenos */
+  --primary-color: #1b4d3e;    /* Tom primário corporativo */
+  --accent-color: #d97706;     /* Dourado/Acobreado de destaque */
+}
+
+/* Tema Escuro (Dark Mode) mantido intacto e sofisticado */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-navbar: rgba(15, 23, 42, 0.85);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --chip-bg: rgba(255, 255, 255, 0.05);
+  --primary-color: #2ec4b6;
+  --accent-color: #f59e0b;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.logo-icon {
-  font-size: 1.8rem;
+.brand:hover {
+  opacity: 0.85;
+}
+
+.brand-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.site-logo {
+  height: 38px; /* Ajuste a altura para encaixar perfeitamente na navbar (entre 38px e 45px) */
+  width: auto;
+  object-fit: contain;
 }
 
 .brand-name {
@@ -72,12 +134,6 @@ html, body {
   color: var(--primary-color);
 }
 
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .theme-toggle {
   display: flex;
   background: var(--chip-bg);
@@ -99,8 +155,6 @@ html, body {
   box-shadow: 0 2px 5px var(--shadow-color);
 }
 
-
-
 .btn-secondary {
   background: transparent;
   border: 1px solid var(--border-color);
@@ -111,6 +165,7 @@ html, body {
   cursor: pointer;
 }
 
+/* Botão Explorar Imóveis */
 .btn-primary {
   background: var(--accent-color);
   color: white;
@@ -173,21 +228,30 @@ html, body {
   margin: 0 auto 2.5rem auto;
 }
 
-/* Caixa de Busca */
+/* Caixa de Busca: Estilo Moderno, Chamativo e com Cores Dinâmicas */
 .search-box-wrapper {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  color: #1e293b;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 1.8rem;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 
+              0 0 0 1px var(--border-color) inset;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search-box-wrapper:hover {
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 
+              0 0 25px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.6);
 }
 
 .search-tabs {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.8rem;
 }
 
@@ -196,7 +260,7 @@ html, body {
   border: none;
   padding: 0.5rem 1.2rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-secondary);
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s, color 0.2s;
@@ -227,27 +291,29 @@ html, body {
 .field-group label {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #475569;
+  color: var(--text-secondary);
   margin-bottom: 0.4rem;
 }
 
 .field-group select {
   padding: 0.75rem;
   border-radius: 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-size: 0.95rem;
   outline: none;
 }
 
 .field-group select:disabled {
-  background-color: #f1f5f9;
-  color: #94a3b8;
+  background-color: var(--chip-bg);
+  color: var(--text-secondary);
   cursor: not-allowed;
-  border-color: #e2e8f0;
+  border-color: var(--border-color);
 }
 
 .field-disabled label {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .btn-search {
@@ -259,9 +325,14 @@ html, body {
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
+  transition: filter 0.2s;
 }
 
-/* Condomínios */
+.btn-search:hover {
+  filter: brightness(1.1);
+}
+
+/* Condomínios e Imóveis */
 .section-condominios, .section-imoveis {
   padding: 5rem 3rem;
   max-width: 1280px;
@@ -277,6 +348,7 @@ html, body {
   font-size: 2.2rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
+  color: var(--text-primary);
 }
 
 .section-header p {
@@ -386,6 +458,7 @@ html, body {
   font-size: 1.15rem;
   margin: 0.5rem 0 1rem 0;
   line-height: 1.4;
+  color: var(--text-primary);
 }
 
 .specs {
@@ -393,6 +466,7 @@ html, body {
   gap: 1rem;
   font-size: 0.85rem;
   background: var(--chip-bg);
+  color: var(--text-secondary);
   padding: 8px 12px;
   border-radius: 10px;
   margin-bottom: 1.2rem;
@@ -446,8 +520,6 @@ html, body {
   gap: 1rem;
 }
 
-
-
 .btn-outline {
   background: transparent;
   border: 1px solid white;
@@ -476,6 +548,7 @@ html, body {
 
 .footer-col h3, .footer-col h4 {
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .footer-col ul {
@@ -500,8 +573,6 @@ html, body {
   color: var(--text-secondary);
   font-size: 0.85rem;
 }
-
-/* Adicionar ou atualizar no home.css */
 
 .btn-chat-action {
   background: #27ae60;
@@ -557,7 +628,6 @@ html, body {
   border: 2px solid white;
 }
 
-/* Janela do Chat */
 .chatbot-window {
   width: 360px;
   height: 480px;
@@ -601,6 +671,7 @@ html, body {
 .bot-info h4 {
   margin: 0;
   font-size: 0.95rem;
+  color: var(--text-primary);
 }
 
 .bot-info .status {
@@ -709,7 +780,7 @@ html, body {
 .carousel-container {
   position: relative;
   width: 90%;
-  max-width: 1200px; /* Largura centralizada idêntica em ambos os lados */
+  max-width: 1200px;
   height: 380px;
   border-radius: 20px;
   overflow: hidden;
@@ -742,14 +813,12 @@ html, body {
   object-fit: cover;
 }
 
-/* Gradiente Suave de Fundo */
 .slide-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(105deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.4) 60%, rgba(15, 23, 42, 0.1) 100%);
 }
 
-/* Card Flutuante de Vidro (Glassmorphism) */
 .slide-content-card {
   position: relative;
   z-index: 10;
@@ -805,7 +874,6 @@ html, body {
   letter-spacing: -0.5px;
 }
 
-/* Botão Autêntico Imobly */
 .btn-confira-imobly {
   background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   color: #ffffff;
@@ -838,7 +906,6 @@ html, body {
   transform: translateX(3px);
 }
 
-/* Setas Laterais de Navegação */
 .nav-arrow {
   position: absolute;
   top: 50%;
@@ -869,7 +936,6 @@ html, body {
 .arrow-left { left: 20px; }
 .arrow-right { right: 20px; }
 
-/* Indicadores / Dots */
 .carousel-dots {
   position: absolute;
   bottom: 18px;
@@ -898,7 +964,6 @@ html, body {
   border-radius: 10px;
 }
 
-/* Responsividade */
 @media (max-width: 900px) {
   .carousel-container {
     width: 94%;
@@ -914,4 +979,126 @@ html, body {
   .slide-title {
     font-size: 1.4rem;
   }
+}
+
+/* ===================================================================
+   Animações de Scroll e Interatividade
+   =================================================================== */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.property-card, .condominio-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.property-card:hover {
+  transform: translateY(-8px) scale(1.01) !important;
+  box-shadow: 0 20px 40px var(--shadow-color) !important;
+}
+
+.property-card img, .condominio-card img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease !important;
+}
+
+.property-card:hover img, .condominio-card:hover img {
+  transform: scale(1.08) !important;
+  filter: brightness(1.05);
+}
+
+button, .btn-primary, .btn-secondary, .btn-search, .tab-btn, .btn-confira-imobly {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+button:active, .btn-primary:active, .btn-search:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-primary:hover, .btn-search:hover {
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* ===================================================================
+   Secção: Localização Estratégica & Conveniência Regional
+   =================================================================== */
+.section-localizacao-estrategica {
+  padding: 6rem 3rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  background: var(--bg-primary);
+}
+
+.localizacao-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.local-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.local-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 20px 40px var(--shadow-color);
+}
+
+.local-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+  background: var(--chip-bg);
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.local-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.8rem;
+  color: var(--text-primary);
+}
+
+.local-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.local-tag {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(212, 175, 55, 0.15);
+  color: #d4af37;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  letter-spacing: 0.5px;
 }

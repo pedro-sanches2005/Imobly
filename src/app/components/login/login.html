@@ -1,45 +1,130 @@
 <div class="login-container">
-  <div class="login-card">
-    <h1 class="brand-title" (click)="irParaHome()" style="cursor: pointer;" title="Voltar para a Home">🏠 Imobly</h1>
-    <p class="brand-subtitle">Conectando imóveis e pessoas</p>
- 
-
-    <form (ngSubmit)="entrar()">
-      <div class="form-group">
-        <label for="perfil">Perfil de Acesso</label>
-        <select id="perfil" [(ngModel)]="perfilSelecionado" name="perfil" class="form-control">
-          <option value="Locatario">Locatário (Procuro imóvel)</option>
-          <option value="Proprietario">Proprietário / Imobiliária</option>
-        </select>
+  <!-- Lado Esquerdo: Painel Visual Imersivo -->
+  <div class="login-banner">
+    <div class="banner-overlay"></div>
+    <div class="banner-content">
+      <div class="brand-wrapper" (click)="router.navigate(['/'])" style="cursor: pointer;">
+        <span class="brand-text">Imobly</span>
+        <span class="region-badge">Regional</span>
       </div>
-
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input 
-          type="email" 
-          id="email" 
-          [(ngModel)]="email" 
-          name="email" 
-          placeholder="seuemail@exemplo.com" 
-          class="form-control"
-          required
-        />
+      <div class="banner-text-group">
+        <h1>O seu próximo destino começa aqui.</h1>
+        <p>Aceda a condomínios exclusivos e oportunidades únicas em Itu, Salto e Indaiatuba com inteligência e exclusividade.</p>
       </div>
-
-      <div class="form-group">
-        <label for="senha">Palavra-passe</label>
-        <input 
-          type="password" 
-          id="senha" 
-          [(ngModel)]="senha" 
-          name="senha" 
-          placeholder="••••••••" 
-          class="form-control"
-          required
-        />
+      <div class="banner-stats">
+        <div class="stat-item">
+          <span class="stat-number">+1.2k</span>
+          <span class="stat-label">Imóveis Verificados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">3</span>
+          <span class="stat-label">Cidades Atendidas</span>
+        </div>
       </div>
-
-      <button type="submit" class="btn-primary">Entrar no Imobly</button>
-    </form>
+    </div>
   </div>
-</div>
+
+  <!-- Lado Direito: Formulário de Autenticação / Registo -->
+  <div class="login-form-wrapper">
+    <!-- Botão Voltar para a Home no Canto Superior -->
+    <a routerLink="/" class="btn-voltar-home" title="Voltar à página inicial">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <span>Voltar para a Home</span>
+    </a>
+
+    <div class="form-box">
+      <!-- VISTA DE LOGIN -->
+      <div *ngIf="!modoRegistro">
+        <div class="form-header">
+          <h2>Bem-vindo de volta</h2>
+          <p>Introduza as suas credenciais para gerir os seus imóveis ou favoritos.</p>
+        </div>
+
+        <form class="auth-form" (submit)="$event.preventDefault(); entrarNoSistema()">
+          <div class="input-group">
+            <label for="perfil">Perfil de Acesso</label>
+            <div class="select-wrapper">
+              <select id="perfil" class="custom-input">
+                <option value="locatario">Locatário / Comprador (Procurou imóvel)</option>
+                <option value="proprietario">Proprietário / Anunciante</option>
+                <option value="corretor">Corretor / Consultor Imobly</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" class="custom-input" placeholder="exemplo@email.com" required />
+          </div>
+
+          <div class="input-group">
+            <div class="label-row">
+              <label for="password">Palavra-passe</label>
+              <a href="#" class="forgot-link">Esqueceu-se?</a>
+            </div>
+            <input type="password" id="password" class="custom-input" placeholder="••••••••" required />
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <span>Entrar no Imobly</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+
+          <div class="form-footer">
+            <span>Ainda não tem conta?</span>
+            <a href="javascript:void(0)" (click)="alternarModoRegistro(true)" class="register-link">Criar conta gratuita</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- VISTA DE REGISTO (Escolha entre Cliente ou Imobiliária/Proprietário) -->
+      <div *ngIf="modoRegistro" class="registro-container">
+        <div class="form-header">
+          <h2>Junte-se ao Imobly</h2>
+          <p>Selecione o tipo de conta que deseja criar na nossa plataforma integrada.</p>
+        </div>
+
+        <div class="tipo-conta-grid">
+          <div class="card-tipo" [class.ativo]="tipoConta === 'cliente'" (click)="selecionarTipo('cliente')">
+            <div class="icon-box">👤</div>
+            <h3>Cliente / Comprador</h3>
+            <p>Quero encontrar o imóvel ideal, guardar favoritos e falar com consultores.</p>
+          </div>
+
+          <div class="card-tipo" [class.ativo]="tipoConta === 'imobiliaria'" (click)="selecionarTipo('imobiliaria')">
+            <div class="icon-box">🏢</div>
+            <h3>Imobiliária / Proprietário</h3>
+            <p>Quero anunciar imóveis e gerir a captação de clientes na região.</p>
+          </div>
+        </div>
+
+        <!-- Formulário Dinâmico de Registo -->
+        <form class="auth-form" (submit)="$event.preventDefault(); entrarNoSistema()">
+          <div class="input-group">
+            <label>Nome Completo / Razão Social</label>
+            <input type="text" class="custom-input" [placeholder]="tipoConta === 'cliente' ? 'O seu nome' : 'Nome da Imobiliária ou Proprietário'" required />
+          </div>
+
+          <div class="input-group">
+            <label>E-mail de Acesso</label>
+            <input type="email" class="custom-input" placeholder="seu@email.com" required />
+          </div>
+
+          <div class="input-group">
+            <label>Palavra-passe</label>
+            <input type="password" class="custom-input" placeholder="Mínimo 6 caracteres" required />
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <span>Concluir Registo como {{ tipoConta === 'cliente' ? 'Cliente' : 'Imobiliária' }}</span>
+          </button>
+
+          <div class="form-footer">
+            <span>Já tem uma conta?</span>
+            <a href="javascript:void(0)" (click)="alternarModoRegistro(false)" class="register-link">Fazer login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>''

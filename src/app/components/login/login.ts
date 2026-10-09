@@ -1,38 +1,47 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
-  email = '';
-  senha = '';
-  perfilSelecionado: 'Locatario' | 'Proprietario' = 'Locatario';
+  modoRegistro: boolean = false;
+  tipoConta: 'cliente' | 'imobiliaria' = 'cliente';
 
   constructor(private router: Router) {}
 
-  irParaHome() {
-    this.router.navigate(['/']);
+  alternarModoRegistro(status: boolean) {
+    this.modoRegistro = status;
   }
 
-  entrar() {
-    if (!this.email || !this.senha) {
-      alert('Por favor, preencha o e-mail e a senha.');
-      return;
+  selecionarTipo(tipo: 'cliente' | 'imobiliaria') {
+    this.tipoConta = tipo;
+  }
+
+ entrarNoSistema() {
+    if (this.modoRegistro) {
+      if (this.tipoConta === 'cliente') {
+        this.router.navigate(['/cliente-dashboard']);
+      } else if (this.tipoConta === 'imobiliaria') {
+        this.router.navigate(['/painel-corretor']); // Atualizado para a rota correta
+      } else {
+        this.router.navigate(['/cliente-dashboard']);
+      }
+    } else {
+      // Lê o valor selecionado no <select id="perfil">
+      const perfilSelect = (document.getElementById('perfil') as HTMLSelectElement)?.value;
+      
+      // Se for corretor ou proprietario, redireciona para o painel do corretor/proprietário
+      if (perfilSelect === 'corretor' || perfilSelect === 'proprietario') {
+        this.router.navigate(['/painel-corretor']); 
+      } else {
+        this.router.navigate(['/cliente-dashboard']); 
+      }
     }
-
-    localStorage.setItem('usuarioLogado', JSON.stringify({
-      email: this.email,
-      tipoPerfil: this.perfilSelecionado
-    }));
-
-    alert(`Bem-vindo ao Imobly como ${this.perfilSelecionado}!`);
-    this.router.navigate(['/descoberta']);
   }
 }

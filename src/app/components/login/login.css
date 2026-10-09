@@ -1,77 +1,335 @@
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+:host {
+  display: block;
   min-height: 100vh;
-  background-color: #f4f6f9;
-  font-family: Arial, sans-serif;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.login-card {
-  background: #ffffff;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Lado Esquerdo - Banner Imersivo */
+.login-banner {
+  flex: 1;
+  background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(13, 17, 23, 0.92) 0%, rgba(13, 17, 23, 0.7) 100%);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+/* Identidade Visual Consistente (.brand-text igual à Home) */
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+}
+
+.brand-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.region-badge {
+  background: rgba(35, 134, 54, 0.2);
+  color: #3fb950;
+  border: 1px solid rgba(63, 185, 80, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.banner-text-group h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  letter-spacing: -1px;
+}
+
+.banner-text-group p {
+  font-size: 1.1rem;
+  color: #8b949e;
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+.banner-stats {
+  display: flex;
+  gap: 3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3fb950;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+
+/* Lado Direito - Formulário */
+.login-form-wrapper {
+  width: 520px;
+  background-color: #161b22;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  border-left: 1px solid #30363d;
+}
+
+.form-box {
   width: 100%;
   max-width: 380px;
 }
 
-.brand-title {
-  color: #2c3e50;
-  text-align: center;
-  margin: 0;
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-.brand-subtitle {
-  color: #7f8c8d;
-  text-align: center;
-  margin-top: 0.25rem;
+.form-header {
   margin-bottom: 2rem;
+}
+
+.form-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.form-header p {
   font-size: 0.9rem;
+  color: #8b949e;
 }
 
-.form-group {
-  margin-bottom: 1.2rem;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: #34495e;
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
   font-size: 0.85rem;
+  font-weight: 600;
+  color: #c9d1d9;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-link {
+  font-size: 0.8rem;
+  color: #3fb950;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.custom-input {
+  width: 100%;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.custom-input:focus {
+  border-color: #3fb950;
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.15);
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background-color: #238636;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-submit:hover {
+  background-color: #2ea043;
+}
+
+.btn-submit:active {
+  transform: scale(0.98);
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #8b949e;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.register-link {
+  color: #58a6ff;
+  text-decoration: none;
   font-weight: 600;
 }
 
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 0.95rem;
+.register-link:hover {
+  text-decoration: underline;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #3498db;
+/* Responsividade para telemóveis */
+@media (max-width: 900px) {
+  .login-banner {
+    display: none;
+  }
+  .login-form-wrapper {
+    width: 100%;
+    border-left: none;
+  }
 }
 
-.btn-primary {
-  width: 100%;
-  padding: 0.85rem;
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
+/* Botão de Voltar para a Home */
+.btn-voltar-home {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8b949e;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background-color: #0d1117;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #30363d;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.btn-voltar-home:hover {
+  color: #ffffff;
+  border-color: #58a6ff;
+  background-color: #21262d;
+}
+
+.login-form-wrapper {
+  position: relative;
+}
+
+/* Seleção de Tipo de Conta (Cliente vs Imobiliária) */
+.tipo-conta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-tipo {
+  background-color: #0d1117;
+  border: 2px solid #30363d;
+  border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 1rem;
+  text-align: left;
+  transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
-  background-color: #219150;
+.card-tipo:hover {
+  border-color: #8b949e;
+}
+
+.card-tipo.ativo {
+  border-color: #238636;
+  background-color: rgba(35, 134, 54, 0.05);
+}
+
+.card-tipo .icon-box {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-tipo h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.card-tipo p {
+  font-size: 0.75rem;
+  color: #8b949e;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .btn-voltar-home {
+    top: 1rem;
+    right: 1rem;
+  }
 }

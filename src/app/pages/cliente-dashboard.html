@@ -1,0 +1,348 @@
+<div class="dashboard-container" [class.dark-theme]="modoEscuro" [class.light-theme]="!modoEscuro">
+  <!-- Sidebar de Navegação do Cliente -->
+  <aside class="dashboard-sidebar">
+    <div class="brand-wrapper" (click)="irParaHome()">
+      <span class="brand-text">Imobly</span>
+      <span class="region-badge">Cliente</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="javascript:void(0)" class="nav-item" [class.active]="abaAtiva === 'visao-geral'" (click)="mudarAba('visao-geral')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Visão Geral</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" [class.active]="abaAtiva === 'favoritos'" (click)="mudarAba('favoritos')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Os Meus Favoritos</span>
+        <span class="badge-count">{{ imoveisFavoritos.length }}</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" [class.active]="abaAtiva === 'visitas'" (click)="mudarAba('visitas')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Visitas Agendadas</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" [class.active]="abaAtiva === 'mensagens'" (click)="mudarAba('mensagens')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Mensagens & Consultores</span>
+      </a>
+      <a href="javascript:void(0)" class="nav-item" [class.active]="abaAtiva === 'perfil'" (click)="mudarAba('perfil')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Meu Perfil</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-theme-modern" (click)="alternarTema()">
+        <span class="theme-icon-wrapper">{{ modoEscuro ? '☀️' : '🌙' }}</span>
+        <span class="theme-text">{{ modoEscuro ? 'Modo Claro' : 'Modo Escuro' }}</span>
+      </button>
+      <a href="javascript:void(0)" class="btn-logout" (click)="terminarSessao()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Terminar Sessão</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Conteúdo Principal do Painel -->
+  <main class="dashboard-main">
+    <header class="main-header">
+      <div class="welcome-text">
+        <h1>Olá, {{ usuario.nome.split(' ')[0] }} 👋</h1>
+        <p>Aqui estão as novidades e os imóveis registados pelas imobiliárias em {{ usuario.cidade }}.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-theme-pill" (click)="alternarTema()" title="Alternar Tema">
+          <span class="pill-icon">{{ modoEscuro ? '☀️' : '🌙' }}</span>
+          <span class="pill-label">{{ modoEscuro ? 'Claro' : 'Escuro' }}</span>
+        </button>
+        <div class="user-avatar-chip">
+          <div class="avatar-circle">{{ usuario.iniciais }}</div>
+          <div class="avatar-info">
+            <span class="avatar-name">{{ usuario.nome }}</span>
+            <span class="avatar-role">{{ usuario.tipoConta }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- ABA 1: VISÃO GERAL                           -->
+    <!-- ========================================== -->
+    <div *ngIf="abaAtiva === 'visao-geral'">
+      <div class="stats-grid">
+        <div class="stat-card" (click)="mudarAba('favoritos')" style="cursor: pointer;">
+          <div class="stat-icon green">🏠</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ imoveisFavoritos.length }}</span>
+            <span class="stat-label">Imóveis Disponíveis / Favoritos</span>
+          </div>
+        </div>
+        <div class="stat-card" (click)="mudarAba('visitas')" style="cursor: pointer;">
+          <div class="stat-icon blue">📅</div>
+          <div class="stat-info">
+            <span class="stat-value">1</span>
+            <span class="stat-label">Visita Agendada</span>
+          </div>
+        </div>
+        <div class="stat-card" (click)="mudarAba('mensagens')" style="cursor: pointer;">
+          <div class="stat-icon purple">💬</div>
+          <div class="stat-info">
+            <span class="stat-value">1</span>
+            <span class="stat-label">Conversas Ativas</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="content-section">
+        <div class="section-header">
+          <h2>Imóveis Cadastrados na Plataforma</h2>
+          <a href="javascript:void(0)" class="view-all-link" (click)="mudarAba('favoritos')">Ver todos</a>
+        </div>
+
+        <div class="properties-grid" *ngIf="imoveisFavoritos.length > 0">
+          <div class="property-card" *ngFor="let imovel of imoveisFavoritos">
+            <div class="property-image" [style.background-image]="'url(' + imovel.imagem + ')'">
+              <span class="property-badge">{{ imovel.badge }}</span>
+              <button class="btn-favorite active" (click)="removerFavorito(imovel.id)" title="Remover imóvel">❤️</button>
+            </div>
+            <div class="property-details">
+              <h3>{{ imovel.titulo }}</h3>
+              <p class="property-location">📍 {{ imovel.localizacao }}</p>
+              <div class="property-footer">
+                <span class="property-price">{{ imovel.preco }}</span>
+                <button class="btn-details" (click)="verDetalhesImovel(imovel.id)">Ver Detalhes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="imoveisFavoritos.length === 0">
+          <p>Ainda não existem imóveis cadastrados pelos administradores no painel.</p>
+          <button class="btn-primary" (click)="irParaDescoberta()">Explorar Plataforma</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ABA 2: OS MEUS FAVORITOS                     -->
+    <!-- ========================================== -->
+    <div *ngIf="abaAtiva === 'favoritos'" class="tab-content-pane">
+      <div class="section-header">
+        <h2>Lista de Imóveis Dinâmicos</h2>
+        <span class="subtitle-count">{{ imoveisFavoritos.length }} imóveis ativos no sistema</span>
+      </div>
+      <div class="properties-grid" *ngIf="imoveisFavoritos.length > 0">
+        <div class="property-card" *ngFor="let imovel of imoveisFavoritos">
+          <div class="property-image" [style.background-image]="'url(' + imovel.imagem + ')'">
+            <span class="property-badge">{{ imovel.badge }}</span>
+            <button class="btn-favorite active" (click)="removerFavorito(imovel.id)">❤️</button>
+          </div>
+          <div class="property-details">
+            <h3>{{ imovel.titulo }}</h3>
+            <p class="property-location">📍 {{ imovel.localizacao }}</p>
+            <div class="property-footer">
+              <span class="property-price">{{ imovel.preco }}</span>
+              <button class="btn-details" (click)="verDetalhesImovel(imovel.id)">Ver Detalhes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="imoveisFavoritos.length === 0">
+        <p>Nenhum imóvel foi cadastrado pela imobiliária até o momento.</p>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ABA 3: VISITAS AGENDADAS E CALENDÁRIO        -->
+    <!-- ========================================== -->
+    <div *ngIf="abaAtiva === 'visitas'" class="tab-content-pane">
+      <div class="section-header">
+        <h2>As Suas Visitas Agendadas</h2>
+        <span class="subtitle-count">Gestão de horários com restrições de calendário</span>
+      </div>
+
+      <div class="visitas-layout-wrapper" [class.grid-split]="reagendamentoAtivo">
+        <div class="visitas-list-container">
+          <div class="visit-card" *ngFor="let visita of visitasAgendadas">
+            <div class="visit-info">
+              <h3>{{ visita.imovel }}</h3>
+              <p>📅 Data: {{ visita.data }}</p>
+              <p>📍 Endereço: {{ visita.endereco }}</p>
+              <span class="status-badge confirmed">{{ visita.status }}</span>
+            </div>
+            <div class="visit-actions">
+              <button class="btn-modern-reschedule" (click)="abrirReagendamento(visita.id)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.73-5.73"/></svg>
+                <span>Reagendar Visita</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendário Moderno com Restrições Solicitadas -->
+        <div class="modern-calendar-drawer" *ngIf="reagendamentoAtivo">
+          <div class="calendar-drawer-header">
+            <h3>Escolha Nova Data e Horário</h3>
+            <button class="btn-close-drawer" (click)="cancelarReagendamento()">✕</button>
+          </div>
+
+          <div class="calendar-body-content">
+            <div class="form-group-cal">
+              <label>Nova Data Pretendida:</label>
+              <input 
+                type="date" 
+                [(ngModel)]="novaDataVisita" 
+                [min]="dataMinimaHoje"
+                [max]="dataMaximaAnoAtual"
+                class="input-date-modern" />
+              <small class="info-domingo-hint">⚠️ Restrição: Bloqueia datas passadas, domingos e anos futuros.</small>
+            </div>
+
+            <div class="form-group-cal" *ngIf="novaDataVisita">
+              <label>Horários Disponíveis:</label>
+              <div class="time-slots-grid">
+                <button 
+                  type="button"
+                  class="time-slot-btn" 
+                  *ngFor="let h of horariosDisponiveis"
+                  [class.selected]="novoHorarioVisita === h"
+                  (click)="novoHorarioVisita = h">
+                  {{ h }}
+                </button>
+              </div>
+            </div>
+
+            <div class="alert-error-msg" *ngIf="avisoErroData">
+              {{ avisoErroData }}
+            </div>
+
+            <div class="calendar-drawer-actions">
+              <button class="btn-secondary" (click)="cancelarReagendamento()">Cancelar</button>
+              <button class="btn-primary" (click)="validarEAvancarReagendamento()">Continuar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ABA 4: MENSAGENS & CONSULTORES             -->
+    <!-- ========================================== -->
+    <div *ngIf="abaAtiva === 'mensagens'" class="tab-content-pane">
+      <div class="section-header">
+        <h2>Mensagens & Consultores Imobiliários</h2>
+        <span class="subtitle-count">Conversas em tempo real</span>
+      </div>
+
+      <div class="chat-dashboard-layout" *ngIf="conversaAtiva">
+        <div class="chat-sidebar-list">
+          <div 
+            class="chat-contact-item" 
+            *ngFor="let conv of conversas" 
+            [class.active]="conversaAtiva.id === conv.id"
+            (click)="selecionarConversa(conv)">
+            <div class="chat-avatar">{{ conv.avatar }}</div>
+            <div class="chat-contact-info">
+              <div class="contact-header-row">
+                <h4>{{ conv.consultor }}</h4>
+                <span class="chat-time">{{ conv.tempo }}</span>
+              </div>
+              <p>{{ conv.ultimaMensagem }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-window-container">
+          <div class="chat-window-header">
+            <div class="chat-avatar sm">{{ conversaAtiva.avatar }}</div>
+            <div class="chat-window-title">
+              <h3>{{ conversaAtiva.consultor }}</h3>
+              <span>{{ conversaAtiva.cargo }}</span>
+            </div>
+            <span class="online-indicator">● Online</span>
+          </div>
+
+          <div class="chat-messages-body">
+            <div 
+              class="chat-bubble-wrapper" 
+              *ngFor="let msg of conversaAtiva.mensagens"
+              [class.outgoing]="msg.remetente === 'cliente'"
+              [class.incoming]="msg.remetente === 'consultor'">
+              <div class="chat-bubble">
+                <p>{{ msg.texto }}</p>
+                <span class="msg-time">{{ msg.hora }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-footer">
+            <input 
+              type="text" 
+              [(ngModel)]="novaMensagemTexto" 
+              (keyup.enter)="enviarMensagem()" 
+              placeholder="Escreva a sua mensagem..." />
+            <button class="btn-send-msg" (click)="enviarMensagem()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ABA 5: MEU PERFIL (AUTOMÁTICO DA DOCUMENTAÇÃO) -->
+    <!-- ========================================== -->
+    <div *ngIf="abaAtiva === 'perfil'" class="tab-content-pane">
+      <div class="section-header">
+        <h2>Perfil do Utilizador (Automático)</h2>
+      </div>
+      <div class="profile-card">
+        <div class="profile-field">
+          <label>Nome Completo:</label>
+          <input type="text" [(ngModel)]="usuario.nome" disabled />
+        </div>
+        <div class="profile-field">
+          <label>Email:</label>
+          <input type="text" [(ngModel)]="usuario.email" disabled />
+        </div>
+        <div class="profile-field">
+          <label>Instituição / Curso:</label>
+          <input type="text" value="{{ usuario.instituicao }} - {{ usuario.curso }}" disabled />
+        </div>
+        <div class="profile-field">
+          <label>Residência:</label>
+          <input type="text" [(ngModel)]="usuario.cidade" disabled />
+        </div>
+        <button class="btn-primary" (click)="salvarPerfil()">Guardar Alterações</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL 1: CONFIRMAÇÃO DE REAGENDAMENTO      -->
+  <!-- ========================================== -->
+  <div class="custom-modal-overlay" *ngIf="modalPasso1Visivel">
+    <div class="custom-modal-card">
+      <div class="modal-icon-header blue">❓</div>
+      <h3>Confirmar Reagendamento</h3>
+      <p>Deseja mover a visita para o dia selecionado às <strong>{{ novoHorarioVisita }}</strong>?</p>
+      <div class="custom-modal-actions">
+        <button class="btn-secondary" (click)="fecharModalPasso1()">Voltar</button>
+        <button class="btn-primary" (click)="confirmarPasso1ESeguir()">Sim, Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL 2: SUCESSO FINAL                     -->
+  <!-- ========================================== -->
+  <div class="custom-modal-overlay" *ngIf="modalPasso2Visivel">
+    <div class="custom-modal-card">
+      <div class="modal-icon-header green">✅</div>
+      <h3>Reagendamento Concluído!</h3>
+      <p>O seu pedido foi enviado com sucesso para o consultor responsável.</p>
+      <div class="custom-modal-actions single">
+        <button class="btn-primary full" (click)="concluirReagendamentoFinal()">Entendido e Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>

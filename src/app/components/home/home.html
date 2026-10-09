@@ -1,11 +1,11 @@
-<div class="home-container" #homeContainer>
+<div class="home-container" #homeContainer id="topo">
   <!-- Navbar Flutuante -->
   <nav class="navbar">
-    <div class="brand" (click)="irParaHome()" style="cursor: pointer;" title="Voltar ao início">
-      <span class="logo-icon">🏠</span>
-      <span class="brand-name">Imobly <small class="region-badge">Itu & Região</small></span>
+    <div class="brand" (click)="rolarParaSeccao('topo', $event)" style="cursor: pointer;" title="Voltar ao topo">
+      <span class="brand-text">Imobly</span>
+      <span class="region-badge">Regional</span>
     </div>
-
+   
     <div class="nav-links">
       <a href="#condominios" (click)="rolarParaSeccao('condominios', $event)">Condomínios</a>
       <a href="#destaques" (click)="rolarParaSeccao('destaques', $event)">Lançamentos</a>
@@ -19,8 +19,9 @@
         <button [class.active]="themeService.currentTheme === 'system'" (click)="mudarTema('system')" title="Tema do Sistema">💻</button>
       </div>
 
-      <button class="btn-secondary" (click)="irParaLogin()">Entrar</button>
-      <button class="btn-primary" (click)="irParaDescoberta()">Explorar Imóveis</button>
+      <!-- BOTÃO PRINCIPAL: ENTRAR NO IMOBLY -->
+      <button class="btn-secondary" (click)="entrarNoImobly()">Entrar no Imobly</button>
+      
     </div>
   </nav>
 
@@ -75,18 +76,16 @@
           </div>
 
           <button class="btn-search" (click)="irParaDescoberta()">
-            🔍 Buscar Imóveis
+             Buscar Imóveis
           </button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CARROSSEL EXCLUSIVO DE DESTAQUES E REGIÕES (Com Filtro Dinâmico) -->
+  <!-- CARROSSEL EXCLUSIVO DE DESTAQUES E REGIÕES -->
   <section class="zonas-carousel-section" (mouseenter)="pararCarrosselAutomatico()" (mouseleave)="iniciarCarrosselAutomatico()">
     <div class="carousel-container">
-      
-      <!-- Slide Ativo -->
       <div 
         *ngFor="let zona of zonasAtendidas; let i = index" 
         class="carousel-slide" 
@@ -95,7 +94,6 @@
         <img [src]="zona.imagem" [alt]="zona.titulo" />
         <div class="slide-overlay"></div>
 
-        <!-- Card Flutuante com Envio do Filtro do Condomínio -->
         <div class="slide-content-card">
           <div class="location-badge">
             <span class="pin-icon">📍</span> {{ zona.cidade }}
@@ -110,11 +108,9 @@
         </div>
       </div>
 
-      <!-- Controles Laterais (Setas) -->
       <button class="nav-arrow arrow-left" (click)="slideAnterior()" title="Anterior">‹</button>
       <button class="nav-arrow arrow-right" (click)="proximoSlide()" title="Próximo">›</button>
 
-      <!-- Indicadores / Dots na Parte Inferior -->
       <div class="carousel-dots">
         <span 
           *ngFor="let dot of zonasAtendidas; let idx = index" 
@@ -123,7 +119,6 @@
           (click)="irParaSlide(idx)">
         </span>
       </div>
-
     </div>
   </section>
 
@@ -185,7 +180,7 @@
           </div>
           <div class="price-bar">
             <span class="price">R$ 7.800.000</span>
-            <button class="btn-visita">Agendar Visita</button>
+            <button class="btn-visita" (click)="entrarNoImobly()">Agendar Visita</button>
           </div>
         </div>
       </div>
@@ -203,7 +198,7 @@
           </div>
           <div class="price-bar">
             <span class="price">R$ 5.450.000</span>
-            <button class="btn-visita">Agendar Visita</button>
+            <button class="btn-visita" (click)="entrarNoImobly()">Agendar Visita</button>
           </div>
         </div>
       </div>
@@ -221,7 +216,7 @@
           </div>
           <div class="price-bar">
             <span class="price">R$ 12.500/mês</span>
-            <button class="btn-visita">Agendar Visita</button>
+            <button class="btn-visita" (click)="entrarNoImobly()">Agendar Visita</button>
           </div>
         </div>
       </div>
@@ -237,7 +232,39 @@
         <button class="btn-chat-action" (click)="toggleChat()">
           💬 Falar com Consultora Virtual
         </button>
-        <button class="btn-outline" (click)="irParaLogin()">Cadastrar Interesse</button>
+        <button class="btn-outline" (click)="entrarNoImobly()">Cadastrar Interesse</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secção: Localização Estratégica -->
+  <section class="section-localizacao-estrategica">
+    <div class="section-header">
+      <span class="hero-subtitle">Conveniência & Mobilidade</span>
+      <h2>Localização Estratégica no Coração do Interior</h2>
+      <p>Proximidade inteligente com as principais vias de acesso, polos industriais e centros educacionais de excelência.</p>
+    </div>
+
+    <div class="localizacao-grid">
+      <div class="local-card">
+        <div class="local-icon">🛣️</div>
+        <h3>Rodovia SP-075</h3>
+        <p>Acesso rápido e direto para Campinas, Sorocaba, Aeroporto de Viracopos e ligação facilitada com São Paulo.</p>
+        <span class="local-tag">Mobilidade Total</span>
+      </div>
+
+      <div class="local-card">
+        <div class="local-icon">🎓</div>
+        <h3>Escolas Bilíngues & Faculdades</h3>
+        <p>Próximo a instituições renomadas e centros universitários (como a Fatec Itu), ideal para a educação da família.</p>
+        <span class="local-tag">Educação de Alto Nível</span>
+      </div>
+
+      <div class="local-card">
+        <div class="local-icon">🛍️</div>
+        <h3>Centros Comerciais & Gastronomia</h3>
+        <p>Perto de shoppings, hipermercados e polos gastronômicos tradicionais em Itu, Salto e Indaiatuba.</p>
+        <span class="local-tag">Comodidade Urbana</span>
       </div>
     </div>
   </section>

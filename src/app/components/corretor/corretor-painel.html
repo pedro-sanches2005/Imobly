@@ -1,0 +1,215 @@
+<div class="dashboard-layout">
+  
+  <!-- Barra Lateral (Sidebar) -->
+  <aside class="sidebar" [class.light-theme]="isModoClaro">
+    <div class="sidebar-header">
+      <h2>Imobly</h2>
+      <span class="badge-role corretor-badge">Corretor</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="abaAtiva === 'visao-geral'" (click)="mudarAba('visao-geral')">
+        <i>🏠</i> Visão Geral & Anúncios
+      </a>
+      <a class="nav-item" [class.active]="abaAtiva === 'meus-imoveis'" (click)="mudarAba('meus-imoveis')">
+        <i>🏢</i> Gerir Imóveis
+      </a>
+      <a class="nav-item" [class.active]="abaAtiva === 'perfil'" (click)="mudarAba('perfil')">
+        <i>👤</i> Meu Perfil
+      </a>
+      <a class="nav-item" [class.active]="abaAtiva === 'configuracoes'" (click)="mudarAba('configuracoes')">
+        <i>⚙️</i> Configurações
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-theme" (click)="alternarTema()">
+        {{ isModoClaro ? '🌙 Modo Escuro' : '☀️ Modo Claro' }}
+      </button>
+      <button class="btn-logout" (click)="terminarSessao()">
+        🚪 Sair
+      </button>
+    </div>
+  </aside>
+
+  <!-- Conteúdo Principal -->
+  <main class="dashboard-main" [class.light-theme]="isModoClaro">
+    
+    <!-- Cabeçalho Principal com Cartão do Corretor Compacto -->
+    <header class="main-header">
+      <div class="welcome-box">
+        <h1>Painel do Corretor</h1>
+        <p>Gerencie seus anúncios e captações de forma rápida e integrada.</p>
+      </div>
+
+      <!-- Cartão do Corretor Compacto (Largura Fixa 220px e espaçamento ajustado) -->
+      <div class="corretor-badge-card">
+        <span class="c-name">{{ anunciante.nome }}</span>
+        <span class="c-creci">CRECI: {{ anunciante.creci }}</span>
+      </div>
+    </header>
+
+    <!-- Conteúdo Dinâmico por Aba -->
+    <div class="dashboard-content-section" [ngSwitch]="abaAtiva">
+
+      <!-- ABA 1: VISÃO GERAL (Formulário + Lista lado a lado) -->
+      <div *ngSwitchCase="'visao-geral'" class="corretor-grid-layout">
+        
+        <!-- Formulário de Publicação -->
+        <section class="card-box">
+          <h2>Cadastrar Novo Imóvel</h2>
+          <p class="form-subtitle">Preencha os dados básicos para anunciar.</p>
+
+          <div *ngIf="mensagemSucesso" class="alert-success">
+            {{ mensagemSucesso }}
+          </div>
+
+          <div class="form-group">
+            <label>Título do Imóvel *</label>
+            <input type="text" [(ngModel)]="novoImovel.titulo" placeholder="Ex: Casa Moderna em Condomínio Fechado" />
+          </div>
+
+          <div class="form-group">
+            <label>Localização e Detalhes *</label>
+            <input type="text" [(ngModel)]="novoImovel.localizacao" placeholder="Ex: Itu, SP • 4 Quartos • 300m²" />
+          </div>
+
+          <div class="form-group">
+            <label>Preço de Venda / Arrendamento (R$) *</label>
+            <input type="text" [(ngModel)]="novoImovel.preco" placeholder="Ex: R$ 1.450.000" />
+          </div>
+
+          <div class="form-group">
+            <label>Tag / Destaque</label>
+            <input type="text" [(ngModel)]="novoImovel.badge" placeholder="Ex: Exclusivo / Oportunidade" />
+          </div>
+
+          <div class="form-group">
+            <label>URL da Imagem</label>
+            <input type="text" [(ngModel)]="novoImovel.imagem" placeholder="https://..." />
+          </div>
+
+          <button class="btn-primary-publish" (click)="publicarImovel()">Publicar Imóvel</button>
+        </section>
+
+        <!-- Lista de Anúncios Ativos -->
+        <section class="card-box">
+          <h2>Anúncios Ativos ({{ imoveisAnunciados.length }})</h2>
+          <p class="form-subtitle">Seus imóveis publicados recentemente.</p>
+
+          <div class="active-listings-list" *ngIf="imoveisAnunciados.length > 0; else semImoveis">
+            <div class="listing-card-item" *ngFor="let imovel of imoveisAnunciados">
+              <div class="thumb-img" [style.background-image]="'url(' + imovel.imagem + ')'">
+                <span class="badge-mini" *ngIf="imovel.badge">{{ imovel.badge }}</span>
+              </div>
+              <div class="listing-info">
+                <h3>{{ imovel.titulo }}</h3>
+                <p class="loc">{{ imovel.localizacao }}</p>
+                <p class="prc">{{ imovel.preco }}</p>
+              </div>
+              <button class="btn-delete-listing" (click)="removerAnuncio(imovel.id)">Remover</button>
+            </div>
+          </div>
+
+          <ng-template #semImoveis>
+            <p class="empty-listings">Nenhum imóvel publicado no momento.</p>
+          </ng-template>
+        </section>
+
+      </div>
+
+    <!-- ABA 2: GERIR IMÓVEIS -->
+      <div *ngSwitchCase="'meus-imoveis'" class="card-box full-width-card">
+        <h2>Gestão Completa de Imóveis</h2>
+        <p class="form-subtitle">Visualize, edite, altere o status ou remova todos os seus anúncios publicados.</p>
+
+        <div *ngIf="mensagemSucesso" class="alert-success">
+          {{ mensagemSucesso }}
+        </div>
+
+        <div class="active-listings-list" *ngIf="imoveisAnunciados.length > 0; else semImoveisGestao">
+          <div class="listing-card-item management-card" *ngFor="let imovel of imoveisAnunciados">
+            
+            <div class="thumb-img" [style.background-image]="'url(' + imovel.imagem + ')'">
+              <span class="badge-mini" [class.paused-badge]="imovel.status === 'Pausado'">
+                {{ imovel.status || 'Ativo' }}
+              </span>
+            </div>
+            
+            <div class="listing-info">
+              <h3>{{ imovel.titulo }}</h3>
+              <p class="loc">{{ imovel.localizacao }}</p>
+              <p class="prc">{{ imovel.preco }}</p>
+            </div>
+
+            <div class="management-actions">
+              <button class="btn-action-edit" (click)="abrirModalEdicao(imovel)">✏️ Editar</button>
+              <button class="btn-action-status" (click)="alternarStatusImovel(imovel.id)">
+                {{ imovel.status === 'Pausado' ? '▶️ Ativar' : '⏸️ Pausar' }}
+              </button>
+              <button class="btn-delete-listing" (click)="removerAnuncio(imovel.id)">🗑️ Apagar</button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #semImoveisGestao>
+          <p class="empty-listings">Nenhum imóvel disponível para gestão no momento. Cadastre um na aba de Visão Geral.</p>
+        </ng-template>
+
+        <!-- MODAL DE EDIÇÃO SIMPLES E DIRETO -->
+        <div class="modal-overlay" *ngIf="imovelEmEdicaoId !== null">
+          <div class="modal-content card-box">
+            <h2>Editar Imóvel</h2>
+            <p class="form-subtitle">Altere os campos abaixo e clique em guardar.</p>
+
+            <div class="form-group">
+              <label>Título do Imóvel *</label>
+              <input type="text" [(ngModel)]="imovelEditando.titulo" />
+            </div>
+
+            <div class="form-group">
+              <label>Localização *</label>
+              <input type="text" [(ngModel)]="imovelEditando.localizacao" />
+            </div>
+
+            <div class="form-group">
+              <label>Preço *</label>
+              <input type="text" [(ngModel)]="imovelEditando.preco" />
+            </div>
+
+            <div class="form-group">
+              <label>URL da Imagem</label>
+              <input type="text" [(ngModel)]="imovelEditando.imagem" />
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+              <button class="btn-primary-publish" (click)="salvarEdicaoModal()">Guardar Alterações</button>
+              <button class="btn-delete-listing" (click)="cancelarEdicao()" style="width: 100%;">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ABA 3: MEU PERFIL -->
+      <div *ngSwitchCase="'perfil'" class="card-box full-width-card">
+        <h2>Perfil Profissional</h2>
+        <p class="form-subtitle">Informações cadastrais e credenciais do corretor.</p>
+        <div class="profile-details-box">
+          <p><strong>Nome Completo:</strong> {{ anunciante.nome }}</p>
+          <p><strong>Registro CRECI:</strong> {{ anunciante.creci }}</p>
+          <p><strong>E-mail de Contato:</strong> corretor@imobly.com</p>
+        </div>
+      </div>
+
+      <!-- ABA 4: CONFIGURAÇÕES -->
+      <div *ngSwitchCase="'configuracoes'" class="card-box full-width-card">
+        <h2>Configurações da Conta</h2>
+        <p class="form-subtitle">Ajuste suas preferências de notificação e segurança.</p>
+        <p class="empty-listings">Opções de personalização e segurança disponíveis em breve.</p>
+      </div>
+
+    </div>
+
+  </main>
+</div>
