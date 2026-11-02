@@ -12,6 +12,11 @@
       <h1 class="logo-text">Imobly <small class="region-badge">Itu & Região</small></h1>
     </div>
 
+    <!-- Título Central / Identidade do Feed de Match -->
+    <div class="header-center-title">
+      <span>Feed de Descoberta & Match</span>
+    </div>
+
     <div class="header-actions">
       <!-- Seletor de Tema -->
       <div class="theme-toggle">
@@ -20,133 +25,158 @@
         <button [class.active]="themeService.currentTheme === 'system'" (click)="mudarTema('system')" title="Tema do Sistema">💻</button>
       </div>
 
-      <button class="btn-icon" (click)="mostrarFiltros = !mostrarFiltros" title="Filtros de Busca">
-        ⚙️ <span class="badge" *ngIf="filtroApenasPets || filtroApenasMobiliado">●</span>
-      </button>
       <button class="btn-sair" (click)="sair()">Sair</button>
     </div>
   </header>
 
-  <!-- Filtros -->
-  <div class="filtros-panel" *ngIf="mostrarFiltros">
-    <h3>🔍 Filtrar Imóveis</h3>
-    <div class="filtros-grid">
-      <label class="checkbox-label">
-        <input type="checkbox" [(ngModel)]="filtroApenasPets" (change)="aplicarFiltros()" />
-        Aceita Pets 🐾
-      </label>
-      <label class="checkbox-label">
-        <input type="checkbox" [(ngModel)]="filtroApenasMobiliado" (change)="aplicarFiltros()" />
-        Mobiliado 🛋️
-      </label>
-      <button class="btn-limpar" (click)="limparFiltros()">Limpar Filtros</button>
-    </div>
+  <!-- Layout Principal com Sidebar de Filtros à Esquerda e Card à Direita -->
+  <div class="discovery-content-layout">
+    
+    <!-- Sidebar Lateral de Filtros -->
+    <aside class="sidebar-filtros">
+      <div class="filter-section-title">
+        <h3>🔍 Filtrar Imóveis</h3>
+        <button class="btn-limpar-filtros" *ngIf="filtroApenasPets || filtroApenasMobiliado || cidadeSelecionada" (click)="limparFiltros()">Limpar</button>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-group-label">📍 Cidades</label>
+        <div class="city-chips-vertical">
+          <button class="chip" [class.active]="cidadeSelecionada === ''" (click)="filtrarCidade('')">Todas</button>
+          <button class="chip" [class.active]="cidadeSelecionada === 'itu'" (click)="filtrarCidade('itu')">Itu</button>
+          <button class="chip" [class.active]="cidadeSelecionada === 'indaiatuba'" (click)="filtrarCidade('indaiatuba')">Indaiatuba</button>
+          <button class="chip" [class.active]="cidadeSelecionada === 'salto'" (click)="filtrarCidade('salto')">Salto</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-group-label">⚙️ Preferências</label>
+        <div class="toggles-vertical">
+          <label class="toggle-chip">
+            <input type="checkbox" [(ngModel)]="filtroApenasPets" (change)="aplicarFiltros()" />
+            🐾 Aceita Pets
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" [(ngModel)]="filtroApenasMobiliado" (change)="aplicarFiltros()" />
+            🛋️ Mobiliado
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Feed e Pilha de Cards de Match -->
+    <main class="feed-main">
+      <div *ngIf="imoveisFiltrados.length > 0 && indiceAtual < imoveisFiltrados.length" class="deck-container">
+        
+        <!-- Card Traseiro (Próximo Imóvel na Pilha) -->
+        <div class="imovel-card card-background" *ngIf="proximoImovel">
+          <div class="image-container">
+            <img [src]="proximoImovel.imagens[0]" [alt]="proximoImovel.titulo" class="imovel-foto" />
+          </div>
+          <div class="imovel-info">
+            <h2>{{ proximoImovel.titulo }}</h2>
+            <span class="preco">R$ {{ proximoImovel.preco }}/mês</span>
+          </div>
+        </div>
+
+        <!-- Card Frontal Ativo (Arrastável) -->
+        <div 
+          class="imovel-card card-active" 
+          [class.dragging]="isDragging"
+          [class.swipe-right-glow]="dragOffsetX > 40"
+          [class.swipe-left-glow]="dragOffsetX < -40"
+          [style.transform]="'translateX(' + dragOffsetX + 'px) rotate(' + dragRotation + 'deg)'"
+          (mousedown)="onDragStart($event)"
+          (touchstart)="onDragStart($event)">
+
+          <!-- Overlay / Background Feedback ao Arrastar -->
+          <div class="overlay-match" [style.opacity]="dragOffsetX > 30 ? (dragOffsetX / 180) : 0">
+            <div class="stamp-badge stamp-match">MATCH ❤️</div>
+          </div>
+
+          <div class="overlay-deslike" [style.opacity]="dragOffsetX < -30 ? (-dragOffsetX / 180) : 0">
+            <div class="stamp-badge stamp-deslike">DESLIKE ✖</div>
+          </div>
+
+          <!-- Galeria de Imagens -->
+          <div class="image-container">
+            <img [src]="imovelAtual.imagens[imagemIndexAtual]" [alt]="imovelAtual.titulo" class="imovel-foto" draggable="false" />
+            
+            <button *ngIf="imovelAtual.imagens.length > 1" class="nav-img left" (click)="$event.stopPropagation(); imagemAnterior()">❮</button>
+            <button *ngIf="imovelAtual.imagens.length > 1" class="nav-img right" (click)="$event.stopPropagation(); proximaImagem()">❯</button>
+
+            <div class="image-counter">
+              {{ imagemIndexAtual + 1 }} / {{ imovelAtual.imagens.length }}
+            </div>
+
+            <span class="tipo-badge">{{ imovelAtual.tipo }}</span>
+          </div>
+
+          <!-- Informações do Imóvel com clique direto para Detalhes -->
+          <div class="imovel-info" (click)="abrirDetalhes(imovelAtual.id || 1)" style="cursor: pointer;" title="Clique para ver detalhes completos">
+            <div class="header-info">
+              <h2 class="property-title-text">{{ imovelAtual.titulo }}</h2>
+              <span class="preco">R$ {{ imovelAtual.preco }}<small>/mês</small></span>
+            </div>
+
+            <p class="endereco">📍 {{ imovelAtual.endereco }}</p>
+            <p class="descricao">{{ imovelAtual.descricao }}</p>
+
+            <div class="caracteristicas">
+              <span>🛏️ {{ imovelAtual.quarto }} Qto(s)</span>
+              <span>🚿 {{ imovelAtual.banheiro }} Banheiro(s)</span>
+              <span>🚗 {{ imovelAtual.vaga }} Vaga(s)</span>
+              <span>📐 {{ imovelAtual.area }} m²</span>
+              <span *ngIf="imovelAtual.aceitaPets">🐾 Pets</span>
+              <span *ngIf="imovelAtual.mobiliado">🛋️ Mobiliado</span>
+            </div>
+          </div>
+
+          <!-- Guia de Instruções de Arraste -->
+          <div class="swipe-hint">
+            <span>👈 Deslike</span>
+            <span>Arraste para escolher</span>
+            <span>Match 👉</span>
+          </div>
+
+          <!-- Botões de Ação Direta -->
+          <div class="card-actions">
+            <button class="btn-action recuse" (click)="$event.stopPropagation(); recusarImovel()" title="Deslike">✖ Deslike</button>
+            <button class="btn-action match" (click)="$event.stopPropagation(); darMatch()" title="Match">❤️ Match</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tela sem imóveis -->
+      <div *ngIf="indiceAtual >= imoveisFiltrados.length || imoveisFiltrados.length === 0" class="empty-feed">
+        <div class="empty-icon">🎉</div>
+        <h2>Você já viu todos os imóveis!</h2>
+        <p>Volte em breve para novos lançamentos em Itu e região.</p>
+        <button class="btn-primary" (click)="limparFiltros()">Resetar Filtros</button>
+      </div>
+    </main>
+
   </div>
 
-  <!-- Feed e Pilha de Cards de Match -->
-  <main class="feed-main">
-    <div *ngIf="imoveisFiltrados.length > 0 && indiceAtual < imoveisFiltrados.length" class="deck-container">
-      
-      <!-- Card Traseiro (Próximo Imóvel na Pilha) -->
-      <div class="imovel-card card-background" *ngIf="proximoImovel">
-        <div class="image-container">
-          <img [src]="proximoImovel.imagens[0]" [alt]="proximoImovel.titulo" class="imovel-foto" />
-        </div>
-        <div class="imovel-info">
-          <h2>{{ proximoImovel.titulo }}</h2>
-          <span class="preco">R$ {{ proximoImovel.preco }}/mês</span>
-        </div>
-      </div>
-
-      <!-- Card Frontal Ativo (Arrastável) -->
-      <div 
-        class="imovel-card card-active" 
-        [class.dragging]="isDragging"
-        [class.swipe-right-glow]="dragOffsetX > 40"
-        [class.swipe-left-glow]="dragOffsetX < -40"
-        [style.transform]="'translateX(' + dragOffsetX + 'px) rotate(' + dragRotation + 'deg)'"
-        (mousedown)="onDragStart($event)"
-        (touchstart)="onDragStart($event)">
-
-        <!-- Overlay / Background Feedback ao Arrastar -->
-        <div class="overlay-match" [style.opacity]="dragOffsetX > 30 ? (dragOffsetX / 180) : 0">
-          <div class="stamp-badge stamp-match">MATCH ❤️</div>
-        </div>
-
-        <div class="overlay-deslike" [style.opacity]="dragOffsetX < -30 ? (-dragOffsetX / 180) : 0">
-          <div class="stamp-badge stamp-deslike">DESLIKE ✖</div>
-        </div>
-
-        <!-- Galeria de Imagens -->
-        <div class="image-container">
-          <img [src]="imovelAtual.imagens[imagemIndexAtual]" [alt]="imovelAtual.titulo" class="imovel-foto" draggable="false" />
-          
-          <button *ngIf="imovelAtual.imagens.length > 1" class="nav-img left" (click)="$event.stopPropagation(); imagemAnterior()">❮</button>
-          <button *ngIf="imovelAtual.imagens.length > 1" class="nav-img right" (click)="$event.stopPropagation(); proximaImagem()">❯</button>
-
-          <div class="image-counter">
-            {{ imagemIndexAtual + 1 }} / {{ imovelAtual.imagens.length }}
-          </div>
-
-          <span class="tipo-badge">{{ imovelAtual.tipo }}</span>
-        </div>
-
-        <!-- Informações -->
-        <div class="imovel-info">
-          <div class="header-info">
-            <h2>{{ imovelAtual.titulo }}</h2>
-            <span class="preco">R$ {{ imovelAtual.preco }}/mês</span>
-          </div>
-
-          <p class="endereco">📍 {{ imovelAtual.endereco }}</p>
-          <p class="descricao">{{ imovelAtual.descricao }}</p>
-
-          <div class="caracteristicas">
-            <span>🛏️ {{ imovelAtual.quarto }} Qto(s)</span>
-            <span>🚿 {{ imovelAtual.banheiro }} Banheiro(s)</span>
-            <span>🚗 {{ imovelAtual.vaga }} Vaga(s)</span>
-            <span>📐 {{ imovelAtual.area }} m²</span>
-            <span *ngIf="imovelAtual.aceitaPets">🐾 Pets</span>
-            <span *ngIf="imovelAtual.mobiliado">🛋️ Mobiliado</span>
-          </div>
-        </div>
-
-        <!-- Guia de Instruções de Arraste -->
-        <div class="swipe-hint">
-          <span>👈 Deslike</span>
-          <span>Arraste para escolher</span>
-          <span>Match 👉</span>
-        </div>
-
-        <!-- Botões de Ação Direta -->
-        <div class="card-actions">
-          <button class="btn-action recuse" (click)="$event.stopPropagation(); recusarImovel()" title="Deslike">✖ Deslike</button>
-          <button class="btn-action match" (click)="$event.stopPropagation(); darMatch()" title="Match">❤️ Match</button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Tela sem imóveis -->
-    <div *ngIf="indiceAtual >= imoveisFiltrados.length || imoveisFiltrados.length === 0" class="empty-feed">
-      <div class="empty-icon">🎉</div>
-      <h2>Você já viu todos os imóveis!</h2>
-      <p>Volte em breve para novos lançamentos em Itu e região.</p>
-      <button class="btn-primary" (click)="limparFiltros()">Resetar Filtros</button>
-    </div>
-  </main>
-
-  <!-- Popup Simulação de Match -->
-  <div class="match-modal" *ngIf="matchPopup">
-    <div class="match-content">
-      <h2>🎉 É UM MATCH!</h2>
-      <p>Você e o proprietário demonstraram interesse mudo!</p>
-      <div class="match-avatars">
-        <span>🏠</span>
-        <span>💬</span>
-      </div>
-      <button class="btn-chat" (click)="fecharMatchPopup()">Iniciar Conversa</button>
-      <button class="btn-close" (click)="fecharMatchPopup()">Continuar Explorando</button>
+ 
+<!-- ======================================================= -->
+<!-- POPUP DE MATCH CUSTOMIZADO (PADRÃO MODERNO)            -->
+<!-- ======================================================= -->
+<div class="custom-modal-overlay" *ngIf="matchPopup">
+  <div class="match-modal-card">
+    <div class="match-icon-circle">❤️</div>
+    <h2>É UM MATCH!</h2>
+    <p>Você demonstrou interesse em <strong>{{ imovelAtual?.titulo }}</strong>. O canal de mensagens com o corretor já está disponível na aba de <strong>Mensagens</strong>!</p>
+    
+    <div class="modal-actions-stack">
+      <button class="btn-primary-match" (click)="irParaChatDoMatch()">
+        💬 Ir para o Chat
+      </button>
+      <button class="btn-secondary-match" (click)="fecharMatchPopup()">
+        Continuar Explorando
+      </button>
     </div>
   </div>
+</div>
 </div>

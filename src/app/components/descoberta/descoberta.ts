@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
+import { ImovelService } from '../../services/imovel.service';
 
 @Component({
   selector: 'app-descoberta',
@@ -15,10 +16,10 @@ export class DescobertaComponent implements OnInit {
   indiceAtual: number = 0;
   imagemIndexAtual: number = 0;
   
-  // Filtros e Modais do Template
-  mostrarFiltros: boolean = false;
+  // Filtros e Modais
   filtroApenasPets: boolean = false;
   filtroApenasMobiliado: boolean = false;
+  cidadeSelecionada: string = '';
   matchPopup: boolean = false;
 
   // Estados de Arraste (Swipe/Drag)
@@ -39,36 +40,36 @@ export class DescobertaComponent implements OnInit {
       preco: '7.800.000',
       endereco: 'Terras de São José, Itu - SP',
       descricao: 'Residência de alto luxo integrada à natureza, acabamento em mármore e ampla área de lazer privativa.',
-      quarto: 5, banheiro: 6, vaga: 6,
+      quarto: 5, banheiro: 6, vaga: 6, area: 850, tipo: 'Venda',
       imagens: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600'],
-      condominio: 'terras-de-sao-jose', cidade: 'itu', pets: true, mobiliado: true
+      condominio: 'terras-de-sao-jose', cidade: 'itu', aceitaPets: true, mobiliado: true
     },
     {
       titulo: 'Residência Exclusiva na Fazenda Vila Real',
       preco: '5.450.000',
       endereco: 'Fazenda Vila Real, Itu - SP',
       descricao: 'Arquitetura moderna com vista panorâmica espetacular para a mata nativa e lagos.',
-      quarto: 4, banheiro: 5, vaga: 4,
+      quarto: 4, banheiro: 5, vaga: 4, area: 620, tipo: 'Venda',
       imagens: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600'],
-      condominio: 'fazenda-vila-real', cidade: 'itu', pets: false, mobiliado: true
+      condominio: 'fazenda-vila-real', cidade: 'itu', aceitaPets: false, mobiliado: true
     },
     {
       titulo: 'Casa de Condomínio no Helvetia',
       preco: '4.200.000',
       endereco: 'Helvetia & Polo Country Club, Indaiatuba - SP',
       descricao: 'Sofisticação incomparável para os amantes de tranquilidade e exclusividade.',
-      quarto: 4, banheiro: 4, vaga: 4,
+      quarto: 4, banheiro: 4, vaga: 4, area: 510, tipo: 'Venda',
       imagens: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600'],
-      condominio: 'helvetia', cidade: 'indaiatuba', pets: true, mobiliado: false
+      condominio: 'helvetia', cidade: 'indaiatuba', aceitaPets: true, mobiliado: false
     },
     {
       titulo: 'Oportunidade Residencial em Salto',
-      preco: '1.250.000',
+      preco: '12.500',
       endereco: 'Zonas Nobres, Salto - SP',
       descricao: 'Excelente custo-benefício em condomínio fechado com infraestrutura completa de lazer.',
-      quarto: 3, banheiro: 3, vaga: 2,
+      quarto: 3, banheiro: 3, vaga: 2, area: 280, tipo: 'Locação',
       imagens: ['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600'],
-      condominio: 'salto', cidade: 'salto', pets: true, mobiliado: true
+      condominio: 'salto', cidade: 'salto', aceitaPets: true, mobiliado: true
     }
   ];
 
@@ -77,7 +78,8 @@ export class DescobertaComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private imovelService: ImovelService
   ) {}
 
   ngOnInit(): void {
@@ -113,17 +115,24 @@ export class DescobertaComponent implements OnInit {
 
   aplicarFiltros() {
     this.imoveisFiltrados = this.listaImoveis.filter(i => {
-      if (this.filtroApenasPets && !i.pets) return false;
+      if (this.filtroApenasPets && !i.aceitaPets) return false;
       if (this.filtroApenasMobiliado && !i.mobiliado) return false;
+      if (this.cidadeSelecionada && i.cidade !== this.cidadeSelecionada) return false;
       return true;
     });
     this.indiceAtual = 0;
     this.atualizarImoveisCard();
   }
 
+  filtrarCidade(cidade: string) {
+    this.cidadeSelecionada = cidade;
+    this.aplicarFiltros();
+  }
+
   limparFiltros() {
     this.filtroApenasPets = false;
     this.filtroApenasMobiliado = false;
+    this.cidadeSelecionada = '';
     this.imoveisFiltrados = this.listaImoveis;
     this.indiceAtual = 0;
     this.atualizarImoveisCard();
@@ -157,6 +166,9 @@ export class DescobertaComponent implements OnInit {
   }
 
   darMatch() {
+    if (this.imovelAtual) {
+      this.imovelService.adicionarMatch(this.imovelAtual);
+    }
     this.matchPopup = true;
   }
 
@@ -176,7 +188,13 @@ export class DescobertaComponent implements OnInit {
     this.proximoImovelCard();
   }
 
-  // Galeria de imagens do imóvel
+  // Redireciona para o dashboard já abrindo na aba de mensagens do chat correspondente
+  irParaChatDoMatch() {
+    this.matchPopup = false;
+    // Redireciona e força a abertura direta na aba de mensagens
+    this.router.navigate(['/cliente-dashboard'], { queryParams: { aba: 'mensagens' } });
+  }
+  // Galeria de imagens
   proximaImagem() {
     if (this.imovelAtual && this.imovelAtual.imagens) {
       this.imagemIndexAtual = (this.imagemIndexAtual + 1) % this.imovelAtual.imagens.length;
@@ -201,5 +219,9 @@ export class DescobertaComponent implements OnInit {
 
   irParaHome() {
     this.router.navigate(['/']);
+  }
+
+  abrirDetalhes(id: number) {
+    this.router.navigate(['/detalhes-imovel', id]);
   }
 }

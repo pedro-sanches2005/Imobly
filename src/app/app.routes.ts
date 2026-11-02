@@ -4,6 +4,7 @@ import { LoginComponent } from './components/login/login';
 import { DescobertaComponent } from './components/descoberta/descoberta';
 import { ClienteDashboardComponent } from './pages/cliente-dashboard'; 
 import { CorretorPainelComponent } from './components/corretor/corretor-painel';
+import { DetalhesImovelComponent } from './pages/locatario/detalhes-imovel/detalhes-imovel';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'cliente-dashboard', component: ClienteDashboardComponent },
   { path: 'painel-corretor', component: CorretorPainelComponent },
   { path: 'descoberta', component: DescobertaComponent },
+  { path: 'detalhes-imovel/:id', component: DetalhesImovelComponent },
   { path: '**', redirectTo: '' }
 ];

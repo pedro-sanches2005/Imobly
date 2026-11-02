@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ImovelService, Imovel } from '../services/imovel.service'; // Ajuste o caminho se necessário
+import { Router, ActivatedRoute } from '@angular/router';
+import { ImovelService, Imovel, Conversa } from '../services/imovel.service';
 
 @Component({
   selector: 'app-cliente-dashboard',
@@ -15,7 +15,10 @@ export class ClienteDashboardComponent implements OnInit {
   abaAtiva: string = 'visao-geral';
   modoEscuro: boolean = true;
 
-  // Dados dinâmicos do Utilizador (Baseados na sua documentação)
+  // Propriedades do modal declaradas para evitar erros de compilação
+  modalChatDisponivelVisivel: boolean = false;
+  imovelRecenteMatch: string = 'Mansão Térrea no Terras de São José';
+
   usuario = {
     nome: 'Pedro Sanches Biasini',
     iniciais: 'PB',
@@ -27,26 +30,12 @@ export class ClienteDashboardComponent implements OnInit {
   };
 
   imoveisFavoritos: Imovel[] = [];
-
-  conversas = [
-    {
-      id: 1,
-      consultor: 'Carlos Imobiliária',
-      cargo: 'Consultor Regional (Itu & Salto)',
-      avatar: 'CI',
-      ultimaMensagem: 'Olá Pedro! Conseguiu analisar as novas propriedades em Itu?',
-      tempo: 'Há 2 horas',
-      mensagens: [
-        { remetente: 'consultor', texto: 'Olá Pedro! Seja bem-vindo à Imobly.', hora: '10:15' },
-        { remetente: 'cliente', texto: 'Olá Carlos! Sim, estou a acompanhar as novidades.', hora: '10:20' }
-      ]
-    }
-  ];
+  matchesAtivos: any[] = [];
+  conversas: Conversa[] = [];
 
   conversaAtiva: any = null;
   novaMensagemTexto: string = '';
 
-  // Controlo de Reagendamento e Calendário
   reagendamentoAtivo: boolean = false;
   visitaSelecionadaId: number | null = null;
   novaDataVisita: string = '';
@@ -63,27 +52,40 @@ export class ClienteDashboardComponent implements OnInit {
   visitasAgendadas = [
     {
       id: 1,
-      imovel: 'Atendimento Personalizado - Região de Itu',
+      imovel: 'Mansão Térrea no Terras de São José - Itu',
       data: '12 de Outubro de 2026 às 14:30',
-      endereco: 'Itu, SP',
+      endereco: 'Terras de São José, Itu - SP',
       status: 'Confirmada com Corretor'
     }
   ];
 
-  constructor(private router: Router, private imovelService: ImovelService) {}
+  constructor(
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private imovelService: ImovelService
+  ) {}
 
   ngOnInit(): void {
-    // Carrega dinamicamente os imóveis cadastrados pelos corretores/admins
-    this.carregarImoveis();
+    this.carregarDadosGlobais();
+    
+    // Verifica se veio da rota com queryParam indicando a aba de mensagens diretamente
+    const abaParam = this.route.snapshot.queryParams['aba'];
+    if (abaParam) {
+      this.abaAtiva = abaParam;
+    }
 
     if (this.conversas.length > 0) {
-      this.conversaAtiva = this.conversas[0];
+      this.conversaAtiva = this.conversas[this.conversas.length - 1];
+      this.imovelRecenteMatch = this.conversaAtiva.imovelAssociado || 'Imóvel em Destaque';
     }
+
     this.inicializarLimitesDeData();
   }
 
-  carregarImoveis(): void {
+  carregarDadosGlobais(): void {
     this.imoveisFavoritos = this.imovelService.getImoveis();
+    this.matchesAtivos = this.imovelService.getMatches();
+    this.conversas = this.imovelService.getConversas();
   }
 
   inicializarLimitesDeData(): void {
@@ -98,13 +100,39 @@ export class ClienteDashboardComponent implements OnInit {
 
   removerFavorito(id: number): void {
     this.imovelService.removerImovel(id);
-    this.carregarImoveis();
+    this.carregarDadosGlobais();
   }
 
   verDetalhesImovel(id: number): void { this.router.navigate(['/descoberta']); }
   irParaDescoberta(): void { this.router.navigate(['/descoberta']); }
   irParaHome(): void { this.router.navigate(['/']); }
   terminarSessao(): void { this.router.navigate(['/login']); }
+
+  // Métodos do modal de chat disponível
+  fecharModalChatDisponivel(): void {
+    this.modalChatDisponivelVisivel = false;
+  }
+
+  irParaAbaMensagensDoModal(): void {
+    this.modalChatDisponivelVisivel = false;
+    this.abaAtiva = 'mensagens';
+  }
+
+  irParaChat(match: any): void {
+    const conversaEncontrada = this.conversas.find(c => c.imovelAssociado === match.titulo) || this.conversas[0];
+    this.conversaAtiva = conversaEncontrada;
+    this.abaAtiva = 'mensagens';
+  }
+
+  agendarVisitaMatch(match: any): void {
+    this.abaAtiva = 'visitas';
+    const visitaExistente = this.visitasAgendadas.find(v => v.imovel.includes(match.titulo));
+    if (visitaExistente) {
+      this.abrirReagendamento(visitaExistente.id);
+    } else {
+      this.abrirReagendamento(1);
+    }
+  }
 
   abrirReagendamento(id: number): void {
     this.visitaSelecionadaId = id;
@@ -157,7 +185,7 @@ export class ClienteDashboardComponent implements OnInit {
     const visita = this.visitasAgendadas.find(v => v.id === this.visitaSelecionadaId);
     if (visita) {
       visita.data = `${dataFormatada} às ${this.novoHorarioVisita}`;
-      visita.status = 'Reagendamento Solicitado';
+      visita.status = 'Agendamento Confirmado';
     }
 
     this.modalPasso2Visivel = false;

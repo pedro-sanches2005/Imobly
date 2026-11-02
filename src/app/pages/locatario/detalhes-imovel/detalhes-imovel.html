@@ -1,0 +1,120 @@
+<div class="detalhes-container">
+  
+  <!-- Header de Navegação Superior -->
+  <header class="detalhes-header">
+    <button class="btn-voltar" (click)="voltarParaDescoberta()">
+      ← Voltar para a Descoberta
+    </button>
+    <div class="header-actions">
+      <button class="btn-favorito" [class.ativo]="isFavorito" (click)="toggleFavorito()">
+        {{ isFavorito ? '❤️ Favoritado' : '🤍 Favoritar' }}
+      </button>
+    </div>
+  </header>
+
+  <main class="detalhes-content" *ngIf="imovel">
+    
+    <!-- Galeria de Imagens Principal -->
+    <section class="galeria-section">
+      <div class="main-image-wrapper">
+        <img [src]="imovel.imagens[fotoSelecionadaIndex]" [alt]="imovel.titulo" class="foto-principal" />
+        <span class="tipo-badge">{{ imovel.tipo }}</span>
+        <span class="preco-badge">R$ {{ imovel.preco }}<small>/mês</small></span>
+      </div>
+
+      <!-- Carrossel de Miniaturas -->
+      <div class="miniaturas-grid" *ngIf="imovel.imagens.length > 1">
+        <div 
+          *ngFor="let img of imovel.imagens; let i = index" 
+          class="miniatura-item"
+          [class.ativa]="i === fotoSelecionadaIndex"
+          (click)="selecionarFoto(i)">
+          <img [src]="img" [alt]="imovel.titulo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Ficha Técnica e Informações Detalhadas -->
+    <section class="info-section">
+      
+      <div class="title-block">
+        <h1>{{ imovel.titulo }}</h1>
+        <p class="endereco-completo">📍 {{ imovel.endereco }}</p>
+      </div>
+
+      <!-- Grid de Destaques Rápidos -->
+      <div class="highlights-grid">
+        <div class="highlight-card">
+          <span class="icon">🛏️</span>
+          <span class="val">{{ imovel.quarto }}</span>
+          <span class="lbl">Quartos</span>
+        </div>
+        <div class="highlight-card">
+          <span class="icon">🚿</span>
+          <span class="val">{{ imovel.banheiro }}</span>
+          <span class="lbl">Banheiros</span>
+        </div>
+        <div class="highlight-card">
+          <span class="icon">🚗</span>
+          <span class="val">{{ imovel.vaga }}</span>
+          <span class="lbl">Vagas</span>
+        </div>
+        <div class="highlight-card">
+          <span class="icon">📐</span>
+          <span class="val">{{ imovel.area }} m²</span>
+          <span class="lbl">Área Útil</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Descrição Detalhada -->
+      <div class="description-block">
+        <h3>📄 Descrição do Imóvel</h3>
+        <p>{{ imovel.descricao }}</p>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Comodidades e Infraestrutura -->
+      <div class="amenities-block">
+        <h3>✨ Características & Comodidades</h3>
+        <div class="chips-grid">
+          <span class="amenity-chip" *ngIf="imovel.aceitaPets">🐾 Permite Animais / Pets</span>
+          <span class="amenity-chip" *ngIf="imovel.mobiliado">🛋️ Totalmente Mobiliado</span>
+          <span class="amenity-chip">🏊 Piscina Privativa</span>
+          <span class="amenity-chip">🍖 Área de Churrasqueira</span>
+          <span class="amenity-chip">🔒 Portaria 24h</span>
+          <span class="amenity-chip">⚡ Ar Condicionado</span>
+        </div>
+      </div>
+
+      <!-- Ação Direta de Match -->
+      <div class="action-footer">
+        <button class="btn-match-large" (click)="darMatch()">
+          ❤️ Tenho Interesse (Dar Match)
+        </button>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- POPUP CUSTOMIZADO DE MATCH (MODERNO) -->
+  <div class="custom-modal-overlay" *ngIf="matchModalVisivel">
+    <div class="match-modal-card">
+      <div class="match-icon-circle">❤️</div>
+      <h2>É UM MATCH!</h2>
+      <p>Você demonstrou interesse em <strong>{{ imovel.titulo }}</strong>. O proprietário/corretor foi notificado!</p>
+      
+      <div class="modal-actions-stack">
+        <button class="btn-primary-match" (click)="iniciarConversa()">
+          💬 Ir para o Chat
+        </button>
+        <button class="btn-secondary-match" (click)="fecharMatchModal()">
+          Continuar Explorando
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
